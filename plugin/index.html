@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Lightbox with Carousel</title>
+  <link href="lightbox-carousel.css" rel="stylesheet">
+  <!-- Include styles for the feature carousel -->
+  <link rel="stylesheet" type="text/css" href="https://solutions.brightcove.com/bcls/scripts/jQuery-Feature-Carousel/css/feature-carousel.css" />
+</head>
+
+<body>
+  <!-- Custom code for horizontal menu and lightbox player -->
+  <div class="player-block">
+    <a id="but_prev">PREV</a> | <a id="but_pause">PAUSE</a> | <a id="but_start">START</a> | <a id="but_next">NEXT</a>
+    <!-- Container for the carousel -->
+    <div id="carousel-outer-container">
+        <div id="feature-carousel-container" class="well well-small">
+            <div id="feature-carousel" class="carousel" ></div>
+            <div id="carousel-left">
+                <img src="http://solutions.brightcove.com/bcls/scripts/jQuery-Feature-Carousel/images/arrow-left.png" />
+            </div>
+            <div id="carousel-right">
+                <img src="http://solutions.brightcove.com/bcls/scripts/jQuery-Feature-Carousel/images/arrow-right.png" />
+            </div>
+        </div>
+    </div>
+    <!-- Container for the lightbox -->
+    <div id="BCLSlightbox" class="BCLShide">
+
+        <!-- Player embed code with id attribute -->
+        <video id="myPlayerID"
+            data-account="1752604059001"
+            data-playlist-id="5686354139001"
+            data-player="default"
+            data-embed="default"
+            class="video-js" controls></video>
+        <script src="//players.brightcove.net/1752604059001/default_default/index.min.js"></script>
+
+        <div id="BCLSclose" class="BCLSclose">Close</div>
+    </div>
+  </div>
+
+  <!-- Additional scripts for jQuery, Handlebars and the Feature Carousel -->
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.1.2/handlebars.min.js"></script>
+  <script src="https://solutions.brightcove.com/bcls/scripts/jQuery-Feature-Carousel/js/jquery.featureCarousel.js"></script>
+
+  <script type="text/javascript" src="lightbox-carousel.js"></script>
+  <script>videojs('myPlayerID').lightboxCarousel();</script>
+
+</body>
+</html>
