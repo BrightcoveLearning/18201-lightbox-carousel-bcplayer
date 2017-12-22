@@ -3,8 +3,8 @@ videojs.registerPlugin('lightboxCarousel', function() {
         $lightbox = $("#BCLSlightbox"),
         $carousel = $("#feature-carousel"),
         $close = $(".BCLSclose"),
-        // Vars for Handlebars
-        videosTemplate = "{{#each this}}<div class=\"carousel-feature\"><img alt=\"{{name}}\" class=\"carousel-image\" src=\"{{thumbnailURL}}\" width=\"180\" height=\"96\" data-id=\"{{id}}\" /><div class=\"carousel-caption\"><p>{{name}}</p></div></div>{{/each}}",
+        // vars for Handlebars
+        videosTemplate = "{{#each items}}<div class=\"carousel-feature\"><img alt=\"{{name}}\" class=\"carousel-image\" src=\"{{thumbnailURL}}\" width=\"180\" height=\"96\" data-id=\"{{id}}\" /><div class=\"carousel-caption\"><p>{{shortDescription}}</p></div></div>{{/each}}",
         carouselNavigation = "<div id=\"carousel-left\"><img src=\"/en/scripts/jQuery-Feature-Carousel/images/arrow-left.png\" /></div><div id=\"carousel-right\"><img src=\"/en/scripts/jQuery-Feature-Carousel/images/arrow-right.png\" /></div>",
         template,
         data,
@@ -12,84 +12,114 @@ videojs.registerPlugin('lightboxCarousel', function() {
         i = 0,
         max = 0,
         currentVideo,
-        playlistData,
-        videoItem = {},
-        videoArray = [];
+        playlistData =
+            {
+  "items": [
+                  {
+      "id":0,
+      "name":"Tiger",
+      "shortDescription":"Tigers in the wild",
+      "thumbnailURL":"//solutions.brightcove.com/bcls/assets/images/Tiger.jpg",
+      "sources":[
+                      {
+      "type":"video/mp4",
+      "src":"http://solutions.brightcove.com/bcls/assets/videos/Tiger.mp4"
+                      }
+                  ]
+                  },
+                  {
+      "id":1,
+      "name":"Great Blue Heron",
+      "shortDescription":"The great blue heron",
+      "thumbnailURL":"//solutions.brightcove.com/bcls/assets/images/Great-Blue-Heron.png",
+      "sources":[
+                      {
+      "type":"video/mp4",
+      "src":"http://solutions.brightcove.com/bcls/assets/videos/Great-Blue-Heron.mp4"
+                      }
+                  ]
+                  },
+                  {
+      "id":2,
+      "name":"Birds of a Feather",
+      "shortDescription":"A variety of birds",
+      "thumbnailURL":"http://solutions.brightcove.com/bcls/assets/images/BirdsOfAFeather.png",
+      "sources":[
+                      {
+      "type":"video/mp4",
+      "src":"http://solutions.brightcove.com/bcls/assets/videos/BirdsOfAFeather.mp4"
+                      }
+                  ]
+                  },
+                  {
+      "id":3,
+      "name":"Sea Marvels",
+      "shortDescription":"A collection of sea life",
+      "thumbnailURL":"http://solutions.brightcove.com/bcls/assets/images/Sea Marvels.png",
+            "sources":[
+                      {
+      "type":"video/mp4",
+      "src":"http://solutions.brightcove.com/bcls/assets/videos/Sea-Marvels.mp4"
+                      }
+                  ]
+                  }
+              ]};
 
-      var buildPlaylistData = function () {
-        // Build the video data array
-        for (var i in playlistData) {
-        	videoItem = {id: playlistData[i].id, name: playlistData[i].name, thumbnailURL: playlistData[i].thumbnail, shortDescription: playlistData[i].description};
-        	videoArray.push(videoItem);
-        }
+    var buildPlaylistData = function () {
+      // build the related videos carousel
+      template = Handlebars.compile(videosTemplate);
+      results = template(playlistData);
+      $carousel.prepend(results);
+      // instantiate the carousel
+      $carousel.featureCarousel({
+          smallFeatureWidth:    .9,
+          smallFeatureHeight:		.9,
+          "trackerIndividual" : false
+       });
+      // add event listener for clicks on videos
+      $(".carousel-image").on("click", showAndLoad);
+      $("#but_prev").click(function () {
+          $carousel.prev();
+      });
+      $("#but_pause").click(function () {
+          $carousel.pause();
+      });
+      $("#but_start").click(function () {
+          $carousel.start();
+      });
+      $("#but_next").click(function () {
+          $carousel.next();
+      });
+      $close.on("click", hideAndStop);
+
+      // let the video selector know the player is loaded
+          playerLoaded = true;
       };
 
-      var buildCarousel = function () {
-        // Build the videos carousel
-        template = Handlebars.compile(videosTemplate);
-        results = template(videoArray);
-        $carousel.prepend(results);
-        // Instantiate the carousel
-        $carousel.featureCarousel({
-            smallFeatureWidth:    .9,
-            smallFeatureHeight:		.9,
-            "trackerIndividual" : false
-         });
-        // Add event listener for clicks on videos
-        $(".carousel-image").on("click", showAndLoad);
-        $("#but_prev").click(function () {
-            $carousel.prev();
-        });
-        $("#but_pause").click(function () {
-            $carousel.pause();
-        });
-        $("#but_start").click(function () {
-            $carousel.start();
-        });
-        $("#but_next").click(function () {
-            $carousel.next();
-        });
-        $close.on("click", hideAndStop);
-
-        // Let the video selector know the player is loaded
-        playerLoaded = true;
-      };
-
-	    var showAndLoad = function (e) {
-	      // Make sure the player is loaded
+      var showAndLoad = function (videoID) {
+        // make sure the player is loaded
         if (playerLoaded) {
-          // Load the video
-          var currentID = $(this).attr("data-id");
-          var index = videoArray.map(function(el) {
-            return el.id;
-          }).indexOf(currentID);
-
-          // Load the selected video
-          myPlayer.playlist.currentItem(index);
-
-          // Reveal the lightbox
+        // load the video
+          currentVideo = $(this).attr("data-id");
+          myPlayer.src(playlistData.items[currentVideo].sources);
+          // reveal the lightbox
           $lightbox.attr("class", "BCLSshow");
-          // Play the video
-          myPlayer.play();
-        }
-	    };
+          // play the video
+            myPlayer.play();
+          }
+      };
 
-	    var hideAndStop = function () {
-	      // Pause the video
-	      myPlayer.pause();
+      var hideAndStop = function () {
+        // pause the video
+        myPlayer.pause();
 
-	      // Hide the lightbox
-	      $lightbox.attr("class", "BCLShide");
-	    };
+        // hide the lightbox
+        $lightbox.attr("class", "BCLShide");
+      };
 
-	    videojs("myPlayerID").ready(function(){
-	      myPlayer = this;
-
-        myPlayer.one('loadedmetadata', function() {
-        	 playlistData = myPlayer.playlist();
-        	 buildPlaylistData();
-        	 buildCarousel();
-        })
-	    });
+      videojs("myPlayerID").ready(function(){
+          myPlayer = this;
+          buildPlaylistData();
+      });
 
 });
